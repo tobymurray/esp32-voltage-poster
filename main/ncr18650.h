@@ -3,6 +3,6 @@
 
 #include <stdint.h>
 
-float get_battery_voltage(uint16_t* raw_measurement);
+void get_battery_voltage(uint16_t* raw_measurement, float *battery_percentage, float *voltage);
 
 #endif

@@ -45,8 +45,11 @@ void app_main(void) {
 
   uint16_t raw_measurement;
 
+
   ESP_ERROR_CHECK(read_ads1115(&raw_measurement));
-  float voltage = get_battery_voltage(&raw_measurement);
+  float voltage;
+  float battery_percentage;
+  get_battery_voltage(&raw_measurement, &battery_percentage, &voltage);
 
   initialize_wifi_in_station_mode();
   time_t now;
@@ -65,10 +68,13 @@ void app_main(void) {
   char strftime_buf[64];
   get_time_string(strftime_buf);
 
-  char battery_percentage_as_string[7];
-  snprintf(battery_percentage_as_string, 50, "%.2f%%", voltage);
+  char battery_percentage_as_string[6];
+  snprintf(battery_percentage_as_string, 50, "%.1f%%", battery_percentage);
 
-  publish_message(strftime_buf, "esp32", "battery", battery_percentage_as_string);
+  char voltage_as_string[7];
+  snprintf(voltage_as_string, 50, "%.2fV", voltage);
+
+  publish_message(strftime_buf, "esp32", "battery", battery_percentage_as_string, "voltage", voltage_as_string);
   
   ESP_LOGI(TAG, "Entering deep sleep for %d seconds", DEEP_SLEEP_PERIOD_SECONDS);
   esp_deep_sleep(1000000LL * DEEP_SLEEP_PERIOD_SECONDS);

@@ -85,7 +85,7 @@ void wait_for_mqtt_to_connect() {
     xEventGroupClearBits(mqtt_event_group, MQTT_CONNECTED);
 }
 
-void publish_message(char datetime[], char topic[], char key[], char payload[]) {
+void publish_message(char datetime[], char topic[], char key[], char payload[], char key2[], char payload2[]) {
     root = cJSON_CreateObject();
     // mac_string;
     // cars = cJSON_CreateArray();
@@ -98,6 +98,7 @@ void publish_message(char datetime[], char topic[], char key[], char payload[]) 
     cJSON_AddItemToObject(root, "mac", cJSON_CreateString(mac_as_text));
 
     cJSON_AddItemToObject(root, key, cJSON_CreateString(payload));
+    cJSON_AddItemToObject(root, key2, cJSON_CreateString(payload2));
 
     char *json_as_string;
 
