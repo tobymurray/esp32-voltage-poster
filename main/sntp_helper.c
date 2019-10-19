@@ -87,3 +87,11 @@ bool time_is_stale(time_t now) {
 
   return false;
 }
+
+void get_time_string(char timestring[]) {
+  struct tm timeinfo;
+  time_t now;
+  time(&now);
+  localtime_r(&now, &timeinfo);
+  strftime(timestring, 64 * sizeof(timestring[0]), "%c", &timeinfo);
+}

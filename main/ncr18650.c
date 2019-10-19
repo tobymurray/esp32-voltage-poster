@@ -14,7 +14,7 @@ static const char *TAG = "ncr18650";
 static float convert_voltage_to_ncr18650_capacity(float voltage) { return 120.1212 * voltage - 399.2545; }
 
 
-void get_battery_voltage(uint16_t* raw_measurement) {
+float get_battery_voltage(uint16_t* raw_measurement) {
     // Convert the unsigned u_int16_t into a signed integer
     int raw_measurement_as_signed_int =
         (0x8000 & *raw_measurement ? (int)(0x7FFF & *raw_measurement) - 0x8000 : *raw_measurement);
@@ -47,4 +47,6 @@ void get_battery_voltage(uint16_t* raw_measurement) {
     ESP_LOGI(TAG, "Actual voltage is %.02f", actual_voltage);
     ESP_LOGI(TAG, "Battery is currently at %.02f%% charge", battery_charge_level);
     ESP_LOGI(TAG, "*******************");
+
+    return battery_charge_level;
 }

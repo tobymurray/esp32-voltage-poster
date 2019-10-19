@@ -70,4 +70,10 @@ menu "Application configuration"
             default 0x48
     endmenu
 
+    config MQTT_BROKER_URL
+        string "MQTT Broker URL"
+        default "mqtt://iot.eclipse.org"
+        help
+            URL of the MQTT broker to connect to
+
 endmenu
