@@ -1,22 +1,24 @@
 menu "Application configuration"
 
-    config WIFI_SSID
-        string "WiFi SSID"
-        default "myssid"
-        help
-            SSID (network name) for the example to connect to.
+    menu "Wi-Fi"
+        config WIFI_SSID
+            string "WiFi SSID"
+            default "myssid"
+            help
+                SSID (network name) for the example to connect to.
 
-    config WIFI_PASSWORD
-        string "WiFi Password"
-        default "mypassword"
-        help
-            WiFi password (WPA or WPA2) for the example to use.
+        config WIFI_PASSWORD
+            string "WiFi Password"
+            default "mypassword"
+            help
+                WiFi password (WPA or WPA2) for the example to use.
 
-    config WIFI_MAXIMUM_RETRY
-        int "Maximum retry"
-        default 5
-        help
-            Set the maximum number of retries to avoid station trying to reconnect to the AP forever when the AP is really inexistent.
+        config WIFI_MAXIMUM_RETRY
+            int "Maximum retry"
+            default 5
+            help
+                Set the maximum number of retries to avoid station trying to reconnect to the AP forever when the AP is really inexistent.
+    endmenu
 
     config SNTP_HOST
         string "SNTP HOST"
@@ -35,5 +37,37 @@ menu "Application configuration"
         default 60
         help
             How long to sleep between tasks
+
+    menu "I2C Master"
+        config I2C_MASTER_SCL
+            int "SCL GPIO Num"
+            default 19
+            help
+                GPIO number for I2C Master clock line.
+
+        config I2C_MASTER_SDA
+            int "SDA GPIO Num"
+            default 18
+            help
+                GPIO number for I2C Master data line.
+
+        config I2C_MASTER_PORT_NUM
+            int "Port Number"
+            default 1
+            help
+                Port number for I2C Master device.
+
+        config I2C_MASTER_FREQUENCY
+            int "Master Frequency"
+            default 100000
+            help
+                I2C Speed of Master device.
+    endmenu
+
+    menu "ADS1115 Sensor"
+        config ADS1115_ADDRESS
+            hex "ADS1115 Address"
+            default 0x48
+    endmenu
 
 endmenu
