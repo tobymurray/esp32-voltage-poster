@@ -75,6 +75,8 @@ void app_main(void) {
   snprintf(voltage_as_string, 50, "%.2fV", voltage);
 
   publish_message(strftime_buf, "esp32", "battery", battery_percentage_as_string, "voltage", voltage_as_string);
+
+  wait_for_all_messages_to_be_published();
   
   ESP_LOGI(TAG, "Entering deep sleep for %d seconds", DEEP_SLEEP_PERIOD_SECONDS);
   esp_deep_sleep(1000000LL * DEEP_SLEEP_PERIOD_SECONDS);

@@ -5,6 +5,7 @@
 
 #include "mqtt_helper.h"
 #include "cJSON.h"
+#include "linked_list.h"
 
 #define MQTT_BROKER_URL CONFIG_MQTT_BROKER_URL
 
@@ -42,6 +43,7 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event) {
       break;
     case MQTT_EVENT_PUBLISHED:
       ESP_LOGI(TAG, "MQTT_EVENT_PUBLISHED, msg_id=%d", event->msg_id);
+      delete(event->msg_id);
       break;
     case MQTT_EVENT_DATA:
       ESP_LOGI(TAG, "MQTT_EVENT_DATA");
@@ -85,6 +87,19 @@ void wait_for_mqtt_to_connect() {
     xEventGroupClearBits(mqtt_event_group, MQTT_CONNECTED);
 }
 
+void wait_for_all_messages_to_be_published(void) {
+    int retry = 0;
+    const int retry_count = 20;
+    while (!isEmpty() && ++retry < retry_count) {
+        ESP_LOGI(TAG, "Waiting for all MQTT messages to be published... (%d/%d)", retry, retry_count);
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+    }
+
+    if(retry == retry_count) {
+        ESP_LOGE(TAG, "Failed to wait for all MQTT messages to be published");
+    }
+}
+
 void publish_message(char datetime[], char topic[], char key[], char payload[], char key2[], char payload2[]) {
     root = cJSON_CreateObject();
     // mac_string;
@@ -107,11 +122,10 @@ void publish_message(char datetime[], char topic[], char key[], char payload[], 
 
     int msg_id = esp_mqtt_client_publish(client, topic, json_as_string, 0, EXACTLY_ONCE, 0);
     ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id);
+    insertFirst(msg_id, 0);
 
     free(json_as_string);
 
     /* free all objects under root and root itself */
     cJSON_Delete(root);
-
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
 }
