@@ -134,7 +134,7 @@ esp_err_t read_ads1115(u_int16_t* raw_measurement) {
     // Set 'start single-conversion' bit
     config |= ADS1X15_REG_CONFIG_OS_SINGLE;
 
-      ESP_LOGI(TAG, "Read is %d and write is %d", READ_BIT, WRITE_BIT);
+    ESP_LOGI(TAG, "Read is %d and write is %d", READ_BIT, WRITE_BIT);
 
     int ret;
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();

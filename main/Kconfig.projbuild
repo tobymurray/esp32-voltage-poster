@@ -70,6 +70,16 @@ menu "Application configuration"
             default 0x48
     endmenu
 
+    menu "MCP9808 Temperature Sensors"
+        config MCP9808_ADDRESS_1
+            hex "MCP9808 Sensor 1 Address"
+            default 0x18
+
+        config MCP9808_ADDRESS_2
+            hex "MCP9808 Sensor 2 Address"
+            default 0x19
+    endmenu
+
     config MQTT_BROKER_URL
         string "MQTT Broker URL"
         default "mqtt://iot.eclipse.org"

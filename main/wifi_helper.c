@@ -76,6 +76,7 @@ void initialize_wifi_in_station_mode(void) {
     ESP_ERROR_CHECK(esp_wifi_start() );
 
     ESP_LOGI(TAG, "Connecting to Wi-Fi network: %s", WIFI_SSID);
+    esp_wifi_set_ps(WIFI_PS_MAX_MODEM);
 }
 
 void wait_for_ip(void) {

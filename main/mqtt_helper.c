@@ -12,6 +12,7 @@
 static const char *TAG = "mqtt_helper";
 
 const int MQTT_CONNECTED = BIT0;
+const int RETAIN = 1;
 static esp_mqtt_client_handle_t client;
 
 static EventGroupHandle_t mqtt_event_group;
@@ -23,8 +24,6 @@ cJSON *time_string;
 cJSON *mac_string;
 
 static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event) {
-  esp_mqtt_client_handle_t client = event->client;
-
   switch (event->event_id) {
     case MQTT_EVENT_CONNECTED:
       ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
@@ -35,8 +34,6 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event) {
       break;
     case MQTT_EVENT_SUBSCRIBED:
       ESP_LOGI(TAG, "MQTT_EVENT_SUBSCRIBED, msg_id=%d", event->msg_id);
-      int msg_id = esp_mqtt_client_publish(client, "/topic/qos0", "data", 0, 0, 0);
-      ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id);
       break;
     case MQTT_EVENT_UNSUBSCRIBED:
       ESP_LOGI(TAG, "MQTT_EVENT_UNSUBSCRIBED, msg_id=%d", event->msg_id);
@@ -89,7 +86,7 @@ void wait_for_mqtt_to_connect() {
 
 void wait_for_all_messages_to_be_published(void) {
     int retry = 0;
-    const int retry_count = 20;
+    const int retry_count = 50;
     while (!isEmpty() && ++retry < retry_count) {
         ESP_LOGI(TAG, "Waiting for all MQTT messages to be published... (%d/%d)", retry, retry_count);
         vTaskDelay(100 / portTICK_PERIOD_MS);
@@ -120,7 +117,7 @@ void publish_message(char datetime[], char topic[], char key[], char payload[], 
     json_as_string = cJSON_Print(root);
     ESP_LOGI(TAG, "\n%s", json_as_string);
 
-    int msg_id = esp_mqtt_client_publish(client, topic, json_as_string, 0, EXACTLY_ONCE, 0);
+    int msg_id = esp_mqtt_client_publish(client, topic, json_as_string, 0, EXACTLY_ONCE, RETAIN);
     ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id);
     insertFirst(msg_id, 0);
 
