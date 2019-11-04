@@ -11,8 +11,8 @@
 #include "esp_pm.h"
 
 #include "ads1115.h"
-#include "mqtt_helper.h"
 #include "battery32700.h"
+#include "mqtt_helper.h"
 #include "sntp_helper.h"
 #include "wifi_helper.h"
 #include "mcp9808.h"
@@ -28,6 +28,16 @@ static const char *TAG = "app_main";
 RTC_DATA_ATTR static int boot_count = 0;
 
 static void initialize(void) {
+  // Quiet a bunch of logs I'm not interested in right now
+  esp_log_level_set("boot", ESP_LOG_WARN);
+  esp_log_level_set("heap_init", ESP_LOG_WARN);
+  esp_log_level_set("esp_image", ESP_LOG_WARN);
+  esp_log_level_set("spi_flash", ESP_LOG_WARN);
+  esp_log_level_set("system_api", ESP_LOG_WARN);
+  esp_log_level_set("wifi", ESP_LOG_WARN);
+  esp_log_level_set("phy", ESP_LOG_WARN);
+  esp_log_level_set("tcpip_adapter", ESP_LOG_WARN);
+
   // Initialize NVS
   esp_err_t ret = nvs_flash_init();
   if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
@@ -83,13 +93,17 @@ void app_main(void) {
   char strftime_buf[64];
   get_time_string(strftime_buf);
 
-  char battery_percentage_as_string[6];
-  snprintf(battery_percentage_as_string, 50, "%.1f%%", battery_percentage);
+  char battery_percentage_as_string[7];
+  snprintf(battery_percentage_as_string, 7, "%.1f%%", battery_percentage);
 
   char voltage_as_string[7];
-  snprintf(voltage_as_string, 50, "%.2fV", voltage);
+  snprintf(voltage_as_string, 7, "%.2fV", voltage);
 
-  publish_message(strftime_buf, "esp32/battery", "state_of_charge", battery_percentage_as_string, "voltage", voltage_as_string);
+  char free_heap_size[128];
+  snprintf(free_heap_size, 128, "%u", xPortGetFreeHeapSize());
+
+  char low_water_mark[128];
+  snprintf(low_water_mark, 128, "%u", xPortGetMinimumEverFreeHeapSize());
 
   // Publish temperature
   ESP_LOGI(TAG, "Temperature 0 is %.2f", temperature_0);
@@ -100,7 +114,9 @@ void app_main(void) {
   snprintf(temperature_0_as_string, 7, "%.2f", temperature_0);
   snprintf(temperature_1_as_string, 7, "%.2f", temperature_1);
 
+  publish_message(strftime_buf, "esp32/battery", "state_of_charge", battery_percentage_as_string, "voltage", voltage_as_string);
   publish_message(strftime_buf, "esp32/temperature", "temperature_0", temperature_0_as_string, "temperature_1", temperature_1_as_string);
+  publish_message(strftime_buf, "esp32/heap", "free_heap_size", free_heap_size, "low_water_mark", low_water_mark);
 
   wait_for_all_messages_to_be_published();
 
